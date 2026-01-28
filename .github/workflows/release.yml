@@ -15,30 +15,84 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Install create-dmg tool
+        run: brew install create-dmg
+
       - name: Build Universal Binary
         run: |
           swift build -c release --arch arm64 --arch x86_64
 
-      - name: Create App Bundle
+      - name: Create App Bundle Structure
         run: |
-          mkdir -p PRTracker.app/Contents/MacOS
-          mkdir -p PRTracker.app/Contents/Resources
+          # Define variables
+          APP_NAME="PRTracker.app"
+          BINARY_NAME="PRTracker"
+          
+          mkdir -p "$APP_NAME/Contents/MacOS"
+          mkdir -p "$APP_NAME/Contents/Resources"
 
-          # Copy Binary
-          cp .build/apple/Products/Release/PRTracker PRTracker.app/Contents/MacOS/
+          # Copy Universal Binary
+          cp .build/apple/Products/Release/$BINARY_NAME "$APP_NAME/Contents/MacOS/"
 
           # Copy Info.plist
-          cp Sources/Info.plist PRTracker.app/Contents/Info.plist
+          if [ -f "Sources/Info.plist" ]; then
+            cp Sources/Info.plist "$APP_NAME/Contents/Info.plist"
+          else
+            echo "Warning: Sources/Info.plist not found, creating a basic one."
+            cat > "$APP_NAME/Contents/Info.plist" <<EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>CFBundleExecutable</key>
+    <string>PRTracker</string>
+    <key>CFBundleIdentifier</key>
+    <string>com.youruser.PRTracker</string>
+    <key>CFBundleName</key>
+    <string>PRTracker</string>
+    <key>CFBundlePackageType</key>
+    <string>APPL</string>
+    <key>CFBundleShortVersionString</key>
+    <string>1.0.1</string>
+    <key>LSMinimumSystemVersion</key>
+    <string>11.0</string>
+</dict>
+</plist>
+EOF
+          fi
 
-          # Copy Resources (Icon)
-          cp Sources/Resources/AppIcon.icns PRTracker.app/Contents/Resources/
+          # Copy App Icon if it exists
+          if [ -f "Sources/Resources/AppIcon.icns" ]; then
+            cp Sources/Resources/AppIcon.icns "$APP_NAME/Contents/Resources/"
+          fi
 
-          # Verify bundle structure
-          ls -R PRTracker.app
-
-      - name: Create DMG
+      - name: Clean Extended Attributes and Quarantine
         run: |
-          hdiutil create -volname "PRTracker" -srcfolder "PRTracker.app" -ov -format UDZO "PRTracker.dmg"
+          # Removing attributes to ensure the bundle is clean before packaging
+          sudo xattr -rd com.apple.quarantine PRTracker.app || true
+          xattr -rc PRTracker.app || true
+
+      - name: Ad-hoc Code Sign
+        run: |
+          # Ad-hoc signing helps prevent macOS from flagging the binary as corrupted
+          codesign --force --deep --sign - PRTracker.app
+
+      - name: Create Professional DMG
+        run: |
+          # Remove existing DMG if it exists
+          rm -f PRTracker.dmg
+          
+          # Create DMG with Applications folder shortcut
+          create-dmg \
+            --volname "PRTracker Installer" \
+            --window-pos 200 120 \
+            --window-size 600 400 \
+            --icon-size 100 \
+            --icon "PRTracker.app" 175 120 \
+            --hide-extension "PRTracker.app" \
+            --app-drop-link 425 120 \
+            "PRTracker.dmg" \
+            "PRTracker.app"
 
       - name: Upload Release
         uses: softprops/action-gh-release@v1
@@ -47,3 +101,15 @@ jobs:
           files: PRTracker.dmg
           draft: false
           prerelease: false
+          body: |
+            ## macOS Installation Guide
+            Since this is a personal application not signed by an identified Apple developer, please follow these steps:
+            
+            1. Open the downloaded `PRTracker.dmg`.
+            2. Drag **PRTracker** into the **Applications** folder.
+            3. **Important:** Go to your Applications folder, **Right-click** (or Control-click) on PRTracker, and select **Open**.
+            4. When the warning dialog appears, click the **Open** button.
+            
+            ### Alternative (If it still won't open):
+            Run this command in your Terminal:
+            `sudo xattr -rd com.apple.quarantine /Applications/PRTracker.app`
