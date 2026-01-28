@@ -23,7 +23,7 @@ let package = Package(
             dependencies: [
                 .product(name: "OctoKit", package: "octokit.swift")
             ],
-            path: "Sources/PRTracker"
+            path: "Sources"
         )
     ]
 )
