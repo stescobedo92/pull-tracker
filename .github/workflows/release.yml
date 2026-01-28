@@ -3,7 +3,7 @@ name: Build and Release
 on:
   push:
     tags:
-      - 'v*'
+      - "v*"
 
 jobs:
   release:
@@ -23,13 +23,16 @@ jobs:
         run: |
           mkdir -p PRTracker.app/Contents/MacOS
           mkdir -p PRTracker.app/Contents/Resources
-          
+
           # Copy Binary
           cp .build/apple/Products/Release/PRTracker PRTracker.app/Contents/MacOS/
-          
+
           # Copy Info.plist
           cp Sources/Info.plist PRTracker.app/Contents/Info.plist
-          
+
+          # Copy Resources (Icon)
+          cp Sources/Resources/AppIcon.icns PRTracker.app/Contents/Resources/
+
           # Verify bundle structure
           ls -R PRTracker.app
 
