@@ -29,11 +29,40 @@ A native macOS menu bar application to track your GitHub Pull Requests across al
 
 ## Installation
 
-### From Source
+### Option 1: One-Line Install (Easiest)
+
+Copy and paste this command in Terminal:
+```bash
+curl -fsSL https://raw.githubusercontent.com/stescobedo92/pull-tracker/main/scripts/install.sh | bash
+```
+
+This script will:
+- Download the latest release
+- Install it in Applications
+- Remove macOS quarantine restrictions
+- Ready to use with double-click!
+
+### Option 2: Download Release Manually
+
+1. **Download** the latest `PRTracker.dmg` from [Releases](https://github.com/stescobedo92/pull-tracker/releases)
+2. **Open** the DMG and drag PRTracker to Applications
+3. **⚠️ First Launch:**
+   - Go to Applications folder
+   - **Control+Click** (right-click) on PRTracker
+   - Select **"Open"** from the menu
+   - Click **"Open"** in the dialog
+   - Next time it will open normally with double-click
+
+**Alternative via Terminal:**
+```bash
+xattr -d com.apple.quarantine /Applications/PRTracker.app
+```
+
+### Option 3: Build from Source
 
 ```bash
 # Clone the repository
-git clone https://github.com/sergiotrianaescobedo/pull-tracker.git
+git clone https://github.com/stescobedo92/pull-tracker.git
 cd pull-tracker
 
 # Build and run
@@ -66,3 +95,7 @@ The binary will be at `.build/release/PRTracker`
 3. Commit your changes (`git commit -m 'Add amazing feature'`)
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
+
+## License
+
+MIT License - See [LICENSE](LICENSE) for details

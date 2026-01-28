@@ -102,14 +102,34 @@ EOF
           draft: false
           prerelease: false
           body: |
-            ## macOS Installation Guide
-            Since this is a personal application not signed by an identified Apple developer, please follow these steps:
+            ## 📦 Instalación en macOS
             
-            1. Open the downloaded `PRTracker.dmg`.
-            2. Drag **PRTracker** into the **Applications** folder.
-            3. **Important:** Go to your Applications folder, **Right-click** (or Control-click) on PRTracker, and select **Open**.
-            4. When the warning dialog appears, click the **Open** button.
+            ### ⚠️ Importante - Primera vez
+            Esta aplicación no está firmada con Developer ID de Apple. Sigue estos pasos:
             
-            ### Alternative (If it still won't open):
-            Run this command in your Terminal:
-            `sudo xattr -rd com.apple.quarantine /Applications/PRTracker.app`
+            ### ✅ Método Recomendado (Control+Clic):
+            
+            1. **Descargar** `PRTracker.dmg`
+            2. **Abrir** el DMG y arrastrar PRTracker a la carpeta **Aplicaciones**
+            3. **Ir a la carpeta Aplicaciones** (Finder > Aplicaciones)
+            4. **Control+Clic** (o clic derecho) en **PRTracker.app**
+            5. Seleccionar **"Abrir"** del menú contextual
+            6. En el diálogo, hacer clic en **"Abrir"**
+            7. ✨ ¡Listo! La próxima vez se abrirá con doble clic normalmente
+            
+            ### 🔧 Método Alternativo (Terminal):
+            Si el método anterior no funciona:
+            ```bash
+            xattr -d com.apple.quarantine /Applications/PRTracker.app
+            ```
+            
+            ### 📱 Método 3 (Preferencias del Sistema):
+            - Intenta abrir PRTracker normalmente
+            - Ve a **Configuración del Sistema** > **Privacidad y Seguridad**
+            - Busca el mensaje sobre PRTracker y clic en **"Abrir de todas formas"**
+            
+            ---
+            
+            ### 🛡️ ¿Es seguro?
+            Sí, puedes revisar el código fuente completo en este repositorio.
+            La aplicación es open source y construida automáticamente por GitHub Actions.
