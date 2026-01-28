@@ -38,27 +38,8 @@ jobs:
           if [ -f "Sources/Info.plist" ]; then
             cp Sources/Info.plist "$APP_NAME/Contents/Info.plist"
           else
-            echo "Warning: Sources/Info.plist not found, creating a basic one."
-            cat > "$APP_NAME/Contents/Info.plist" <<EOF
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0">
-<dict>
-    <key>CFBundleExecutable</key>
-    <string>PRTracker</string>
-    <key>CFBundleIdentifier</key>
-    <string>com.youruser.PRTracker</string>
-    <key>CFBundleName</key>
-    <string>PRTracker</string>
-    <key>CFBundlePackageType</key>
-    <string>APPL</string>
-    <key>CFBundleShortVersionString</key>
-    <string>1.0.1</string>
-    <key>LSMinimumSystemVersion</key>
-    <string>11.0</string>
-</dict>
-</plist>
-EOF
+            echo "Warning: Sources/Info.plist not found"
+            exit 1
           fi
 
           # Copy App Icon if it exists
