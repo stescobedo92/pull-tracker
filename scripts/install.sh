@@ -30,23 +30,28 @@ curl -L -o "$DMG_FILE" "$LATEST_URL"
 
 # Mount the DMG
 echo "💿 Mounting DMG..."
-MOUNT_OUTPUT=$(hdiutil attach "$DMG_FILE" | tail -n 1)
-VOLUME=$(echo "$MOUNT_OUTPUT" | awk '{print $3}')
+VOLUME=$(hdiutil attach "$DMG_FILE" 2>&1 | grep -o '/Volumes/.*' | head -n 1)
 
 if [ -z "$VOLUME" ]; then
     echo "❌ Error: Could not mount DMG"
     exit 1
 fi
 
+echo "📂 Mounted at: $VOLUME"
+
 # Find the app in the mounted volume
 echo "🔍 Locating PRTracker.app in mounted volume..."
-APP_PATH=$(find "$VOLUME" -name "PRTracker.app" -maxdepth 2 | head -n 1)
+APP_PATH=$(find "$VOLUME" -name "PRTracker.app" -maxdepth 2 2>/dev/null | head -n 1)
 
 if [ -z "$APP_PATH" ]; then
     echo "❌ Error: Could not find PRTracker.app in DMG"
-    hdiutil detach "$VOLUME" -quiet
+    echo "📋 DMG contents:"
+    ls -la "$VOLUME"
+    hdiutil detach "$VOLUME" -quiet 2>/dev/null
     exit 1
 fi
+
+echo "✅ Found app at: $APP_PATH"
 
 # Copy the application
 echo "📋 Copying PRTracker to /Applications..."
